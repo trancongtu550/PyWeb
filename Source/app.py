@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session
 from flask_mysqldb import MySQL
 import MySQLdb.cursors
 import re
-import mysql.connector 
+import mysql.connector
 from mysql.connector import Error
 
 app = Flask(__name__)
@@ -10,12 +10,24 @@ app = Flask(__name__)
 # Change this to your secret key (can be anything, it's for extra protection)
 app.secret_key = 'MEOWHITE666@550'
 
-# Enter your database connection details below
-conn = mysql.connector.connect(user='root', password='anhem550', host='sql.meow.550studios.com',port=3307, database='pythonlogin', auth_plugin='mysql_native_password')
 
+def main():
+    db = MySQLdb.connect(host='sql.meow.550studios.com',
+                         user='root', passwd='anhem550', db='pythonlogin', port='3307')
+# app.config['MYSQL_HOST'] = 'sql.meow.550studios.com'
+# app.config['MYSQL_USER'] = 'root'
+# app.config['MYSQL_PASSWORD'] = 'anhem550'
+# app.config['MYSQL_DB'] = 'pythonlogin'
+# app.config['MYSQL_PORT'] = '3307'
 
 # Intialize MySQL
 mysql = MySQL(app)
+
+
+@app.route('/')
+@app.route('/index.html')
+def index():
+    return render_template("index.html")
 
 
 @app.route('/pythonlogin/', methods=['GET', 'POST'])
@@ -48,6 +60,16 @@ def login():
     return render_template('index.html', msg=msg)
 
 
+@app.route('/pythonlogin/logout')
+def logout():
+    # Remove session data, this will log the user out
+    session.pop('loggedin', None)
+    session.pop('id', None)
+    session.pop('username', None)
+    # Redirect to login page
+    return redirect(url_for('login'))
+
+
 @app.route('/pythonlogin/register', methods=['GET', 'POST'])
 def register():
     # Output message if something goes wrong...
@@ -58,6 +80,26 @@ def register():
         username = request.form['username']
         password = request.form['password']
         email = request.form['email']
+        # Check if account exists using MySQL
+        cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+        cursor.execute(
+            'SELECT * FROM accounts WHERE username = %s', (username,))
+        account = cursor.fetchone()
+        # If account exists show error and validation checks
+        if account:
+            msg = 'Account already exists!'
+        elif not re.match(r'[^@]+@[^@]+\.[^@]+', email):
+            msg = 'Invalid email address!'
+        elif not re.match(r'[A-Za-z0-9]+', username):
+            msg = 'Username must contain only characters and numbers!'
+        elif not username or not password or not email:
+            msg = 'Please fill out the form!'
+        else:
+            # Account doesnt exists and the form data is valid, now insert new account into accounts table
+            cursor.execute(
+                'INSERT INTO accounts VALUES (NULL, %s, %s, %s)', (username, password, email,))
+            mysql.connection.commit()
+            msg = 'You have successfully registered!'
     elif request.method == 'POST':
         # Form is empty... (no POST data)
         msg = 'Please fill out the form!'
@@ -90,5 +132,3 @@ def profile():
     return redirect(url_for('login'))
 
 
-if __name__ == '__main__':
-    app.run(port=5009)
