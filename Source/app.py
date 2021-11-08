@@ -9,16 +9,11 @@ app = Flask(__name__)
 
 # Change this to your secret key (can be anything, it's for extra protection)
 app.secret_key = 'MEOWHITE666@550'
-
-
-def main():
-    db = MySQLdb.connect(host='sql.meow.550studios.com',
-                         user='root', passwd='anhem550', db='pythonlogin', port='3307')
-# app.config['MYSQL_HOST'] = 'sql.meow.550studios.com'
-# app.config['MYSQL_USER'] = 'root'
-# app.config['MYSQL_PASSWORD'] = 'anhem550'
-# app.config['MYSQL_DB'] = 'pythonlogin'
-# app.config['MYSQL_PORT'] = '3307'
+app.config['MYSQL_HOST'] = '550studios.com'
+app.config['MYSQL_USER'] = 'root'
+app.config['MYSQL_PASSWORD'] = 'anhem550'
+app.config['MYSQL_DB'] = 'pythonlogin'
+app.config['MYSQL_PORT'] = 3307
 
 # Intialize MySQL
 mysql = MySQL(app)
@@ -132,3 +127,6 @@ def profile():
     return redirect(url_for('login'))
 
 
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0', port=5009)
