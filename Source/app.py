@@ -8,11 +8,11 @@ from mysql.connector import Error
 app = Flask(__name__)
 
 # Change this to your secret key (can be anything, it's for extra protection)
-app.secret_key = 'MEOWHITE666@550'
-app.config['MYSQL_HOST'] = '550studios.com'
-app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'anhem550'
-app.config['MYSQL_DB'] = 'pythonlogin'
+app.secret_key = ''
+app.config['MYSQL_HOST'] = ''
+app.config['MYSQL_USER'] = ''
+app.config['MYSQL_PASSWORD'] = ''
+app.config['MYSQL_DB'] = ''
 app.config['MYSQL_PORT'] = 3307
 
 # Intialize MySQL
